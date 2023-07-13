@@ -33,10 +33,9 @@ timings on M1 mac:
 - collapsibility 15.29 seconds
 - confounding 17.33 seconds
 - efficiency 748 seconds (12.5 min)
-- fullgrid ... hours
 
-linux machine with 62.5G of RAM
-- efficiency user 13m27, real 12m19
+linux machine with 64G of RAM
+- fullgrid ... hours (overnight)
 
 After each experiments, run the R-script in the corresponding results/[experimentname] directory, to reproduce the plots and statistical analyses of the results
 
