@@ -22,7 +22,7 @@ pip install .
 
 
 ```python
-python mcm/experiments.py [experimentname]
+python binarymcm/experiments.py [experimentname]
 ```
 where experiment name in [collapsibility, confounding, efficiency, fullgrid]
 
