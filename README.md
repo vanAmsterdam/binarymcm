@@ -1,6 +1,8 @@
 # Conditional average treatment effect estimation with marginally constrained models
 
+This repository contains the code reproduce the results of the paper
 
+"Conditional average treatment effect estimation with marginally constrained models" by Wouter van Amsterdam and Rajesh Ranganath, published in the Journal of Causal Inference, 2023
 
 ## installing
 
