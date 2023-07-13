@@ -4,6 +4,8 @@ This repository contains the code reproduce the results of the paper
 
 "Conditional average treatment effect estimation with marginally constrained models" by Wouter van Amsterdam and Rajesh Ranganath, published in the Journal of Causal Inference, 2023
 
+[![DOI](https://zenodo.org/badge/666127129.svg)](https://zenodo.org/badge/latestdoi/666127129)
+
 ## installing
 
 have python 3 and pip installed
