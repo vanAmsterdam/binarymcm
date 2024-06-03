@@ -371,7 +371,13 @@ def experiment_confounding(setting_grid, enforce_offset=True):
         pehe2_constrained = calculate_pehe2(w_constrained2, beta_dict)
         pehe2_full = calculate_pehe2(w_full, beta_dict)
 
-        return pehe2_offset, pehe2_constrained, pehe2_full, pehe2_ate
+        # get absolute prediction errors (ksis)
+        ksis_offset = calculate_ksis(w_offset2, beta_dict)
+        ksis_constrained = calculate_ksis(w_constrained2, beta_dict)
+        ksis_full = calculate_ksis(w_full, beta_dict)
+
+
+        return pehe2_offset, pehe2_constrained, pehe2_full, pehe2_ate, ksis_offset, ksis_constrained, ksis_full
 
     # run this over all settings
     results = vmap(run_setting)(setting_grid)
@@ -388,8 +394,8 @@ def make_grid_confounding_alphas():
     axs = jnp.linspace(jnp.log(1), jnp.log(5), num=5)
     aus = jnp.log(jnp.array([1,2,5.]))
     gamma_ut_signs = jnp.array([-1, 1])
+    atus = jnp.log(jnp.array([1,2,5.]))
     atx = 0.
-    atu = 0.
     axu = 0.
     atxu = 0.
 
@@ -398,12 +404,11 @@ def make_grid_confounding_alphas():
     px = 0.5
     pt = 0.5
 
-    axs_aus_gut = jnp.asarray(list(itertools.product(axs, aus, gamma_ut_signs)))
-    grid_df = pd.DataFrame(axs_aus_gut, columns=['ax', 'au', 'gamma_ut_sign'])
+    axs_aus_gut = jnp.asarray(list(itertools.product(axs, aus, atus, gamma_ut_signs)))
+    grid_df = pd.DataFrame(axs_aus_gut, columns=['ax', 'au', 'atu', 'gamma_ut_sign'])
     grid_df['a0'] = a0
     grid_df['at'] = at
     grid_df['atx'] = atx
-    grid_df['atu'] = atu
     grid_df['axu'] = axu
     grid_df['atxu'] = atxu
 
@@ -429,16 +434,40 @@ def run_grid_confounding():
 
     # run experiment
     result = experiment_confounding(setting_grid)
-    pehe2_offset, pehe2_constrained, pehe2_full, pehe2_ate = result
+    pehe2_offset, pehe2_constrained, pehe2_full, pehe2_ate, ksis_offset, ksis_constrained, ksis_full = result
 
+    # unpack pehes
     setting_df['offset'] = pehe2_offset
     setting_df['constrained'] = pehe2_constrained
     setting_df['full'] = pehe2_full
     setting_df['ate'] = pehe2_ate
 
+    # unpack ksis
+    print(ksis_offset[0].shape)
+    print(ksis_offset[1].shape)
+    print(ksis_offset[2].shape)
+    setting_df['ksi00_offset'] = ksis_offset[0][:,0,0]
+    setting_df['ksi01_offset'] = ksis_offset[0][:,0,1]
+    setting_df['ksi10_offset'] = ksis_offset[0][:,1,0]
+    setting_df['ksi11_offset'] = ksis_offset[0][:,1,1]
+    setting_df['ksi0_offset'] = ksis_offset[1]
+    setting_df['ksi1_offset'] = ksis_offset[2]
+
+    setting_df['ksi00_constrained'] = ksis_constrained[0][:,0,0]
+    setting_df['ksi01_constrained'] = ksis_constrained[0][:,0,1]
+    setting_df['ksi10_constrained'] = ksis_constrained[0][:,1,0]
+    setting_df['ksi11_constrained'] = ksis_constrained[0][:,1,1]
+    setting_df['ksi0_constrained'] = ksis_constrained[1]
+    setting_df['ksi1_constrained'] = ksis_constrained[2]
+
+    setting_df['ksi00_full'] = ksis_full[0][:,0,0]
+    setting_df['ksi01_full'] = ksis_full[0][:,0,1]
+    setting_df['ksi10_full'] = ksis_full[0][:,1,0]
+    setting_df['ksi11_full'] = ksis_full[0][:,1,1]
+    setting_df['ksi0_full'] = ksis_full[1]
+    setting_df['ksi1_full'] = ksis_full[2]
+
     setting_df.to_csv(outdir / "settingdf.csv", index_label='settingidx')
-
-
 
 
 def experiment_collapsibility(setting_grid):

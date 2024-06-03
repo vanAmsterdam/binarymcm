@@ -314,6 +314,27 @@ def parameters_to_probabilities2(b0, bt, bx, btx, **kwargs):
 
     return sigmoid(etas)
 
+def calculate_ksis(param, sim_params):
+    """
+    given parameters for data generating mechanism and estimated parameters,
+    calculate errors in expected outcomes under intervention
+    """
+    # Pr(y=1|do(t),x)
+    qs = parameters_to_probabilities2(**{k: v for k, v in sim_params.items() if k in ['b0', 'bx', 'bt', 'btx']})
+    # estimated versions
+    qhats = parameters_to_probabilities2(*param)
+
+    # ksi = truth - estimate
+    ksi = qs - qhats
+    # ksi0 = E_x [(y - \hat{y}) | do(t=0), x]
+    px = sim_params['px']
+    ksi0 = (1 - px) * (ksi[0,0])**2 + px * (ksi[0,1])**2
+    # ksi1 = E_x [(y - \hat{y}) | do(t=1), x]
+    ksi1 = (1 - px) * (ksi[1,0])**2 + px * (ksi[1,1])**2
+
+    return (ksi, ksi0, ksi1)
+
+
 
 def parameters_to_probabilities3(a0, at, ax, au, atx, atu, axu, atxu):
     """
